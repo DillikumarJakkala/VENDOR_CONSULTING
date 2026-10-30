@@ -85,36 +85,68 @@ def dashboard(request):
     #     }
 
     #     return render(request, 'core/vendor_dashboard.html', context)
+    
     else:
-            # Sub-vendor portal view: Safe filtering by matching user object or username string
+        # Sub-vendor portal view: safely query without type mismatches
+        try:
+            # Attempt 1: If sub_vendor is a direct ForeignKey to User
+            assigned_records = SubVendorAssignment.objects.filter(sub_vendor=user).select_related('requirement')
+        except Exception:
             try:
-                assigned_records = SubVendorAssignment.objects.filter(
-                    Q(sub_vendor=user) | 
-                    Q(sub_vendor__exact=user.username)
-                ).select_related('requirement')
+                # Attempt 2: If sub_vendor points to a Vendor profile linked to User
+                assigned_records = SubVendorAssignment.objects.filter(sub_vendor__user=user).select_related('requirement')
             except Exception:
-                # Fallback if sub_vendor is a string field
-                assigned_records = SubVendorAssignment.objects.filter(
-                    sub_vendor=user.username
-                ).select_related('requirement')
+                # Attempt 3: Fallback for string/char field matching
+                assigned_records = SubVendorAssignment.objects.filter(sub_vendor=user.username).select_related('requirement')
+        
+        requirements = [assignment.requirement for assignment in assigned_records]
+        
+        try:
+            candidates = Candidate.objects.filter(sub_vendor=user).order_by('-id')
+        except Exception:
+            try:
+                candidates = Candidate.objects.filter(sub_vendor__user=user).order_by('-id')
+            except Exception:
+                candidates = Candidate.objects.filter(sub_vendor=user.username).order_by('-id')
+        
+        context = {
+            'requirements': requirements,
+            'candidates': candidates,
+        }
+        return render(request, 'core/vendor_dashboard.html', context)
+    
+    
+    
+    # else:
+    #         # Sub-vendor portal view: Safe filtering by matching user object or username string
+    #         try:
+    #             assigned_records = SubVendorAssignment.objects.filter(
+    #                 Q(sub_vendor=user) | 
+    #                 Q(sub_vendor__exact=user.username)
+    #             ).select_related('requirement')
+    #         except Exception:
+    #             # Fallback if sub_vendor is a string field
+    #             assigned_records = SubVendorAssignment.objects.filter(
+    #                 sub_vendor=user.username
+    #             ).select_related('requirement')
                 
-            requirements = [assignment.requirement for assignment in assigned_records]
+    #         requirements = [assignment.requirement for assignment in assigned_records]
             
-            try:
-                candidates = Candidate.objects.filter(
-                    Q(sub_vendor=user) | 
-                    Q(sub_vendor__exact=user.username)
-                ).order_by('-id')
-            except Exception:
-                candidates = Candidate.objects.filter(
-                    sub_vendor=user.username
-                ).order_by('-id')
+    #         try:
+    #             candidates = Candidate.objects.filter(
+    #                 Q(sub_vendor=user) | 
+    #                 Q(sub_vendor__exact=user.username)
+    #             ).order_by('-id')
+    #         except Exception:
+    #             candidates = Candidate.objects.filter(
+    #                 sub_vendor=user.username
+    #             ).order_by('-id')
             
-            context = {
-                'requirements': requirements,
-                'candidates': candidates,
-            }
-            return render(request, 'core/vendor_dashboard.html', context)
+    #         context = {
+    #             'requirements': requirements,
+    #             'candidates': candidates,
+    #         }
+    #         return render(request, 'core/vendor_dashboard.html', context)
 
 
 @login_required
