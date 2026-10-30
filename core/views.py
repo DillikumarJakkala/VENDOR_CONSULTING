@@ -62,19 +62,28 @@ def dashboard(request):
         return render(request, 'core/admin_dashboard.html', context)
     
     else:
-        # Sub-vendor portal view: Get requirements directly from assignments
-        assigned_records = SubVendorAssignment.objects.filter(sub_vendor=user).select_related('requirement')
+        # Sub-vendor portal view: Flexible lookup matching User, Vendor relation, or Username
+        assigned_records = SubVendorAssignment.objects.filter(
+            Q(sub_vendor=user) | 
+            Q(sub_vendor__user=user) | 
+            Q(sub_vendor__name__iexact=user.username) |
+            Q(sub_vendor__code__iexact=user.username)
+        ).select_related('requirement')
+        
         requirements = [assignment.requirement for assignment in assigned_records]
         
-        candidates = Candidate.objects.filter(sub_vendor=user).order_by('-id')
+        candidates = Candidate.objects.filter(
+            Q(sub_vendor=user) | 
+            Q(sub_vendor__user=user) |
+            Q(sub_vendor__name__iexact=user.username) |
+            Q(sub_vendor__code__iexact=user.username)
+        ).order_by('-id')
         
         context = {
             'requirements': requirements,
             'candidates': candidates,
         }
         return render(request, 'core/vendor_dashboard.html', context)
-
-
 @login_required
 def submit_candidate(request, requirement_id):
     requirement = get_object_or_404(Requirement, id=requirement_id)
