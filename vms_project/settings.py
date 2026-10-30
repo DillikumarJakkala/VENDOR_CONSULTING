@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+import os
 
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +27,7 @@ SECRET_KEY = 'django-insecure-e@t1ye@e_uj@5m_vzeo6$fymb5v@!vhcuqst81_!*9xfu)pkjp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
