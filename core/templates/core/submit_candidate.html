@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Candidate Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f9; }
+        .form-container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-top: 0; }
+        .job-info { background: #e9ecef; padding: 10px 15px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; color: #555; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
+        input[type="text"], input[type="email"], input[type="file"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-submit { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-submit:hover { background: #218838; }
+        .back-link { display: block; margin-top: 15px; text-align: center; color: #007bff; text-decoration: none; }
+        .error-msg { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Submit Candidate Profile</h2>
+        <h2>Sreenidhi Candidate Submission Form - {{ assignment.requirement.title }}</h2>
+        <div class="job-info">
+            <strong>Job Title:</strong> {{ requirement.job_title }} <br>
+            <strong>Company:</strong> {{ requirement.company_name }}
+        </div>
+
+        {% if error %}
+            <div class="error-msg">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Candidate Full Name *</label>
+                <input type="text" name="candidate_name" required placeholder="e.g. John Doe">
+            </div>
+
+            <div class="form-group">
+                <label>Candidate Email</label>
+                <input type="email" name="candidate_email" placeholder="e.g. john@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Experience</label>
+                <input type="text" name="experience" placeholder="e.g. 4 Years">
+            </div>
+
+            <div class="form-group">
+                <label>Resume Upload (PDF/Docx) *</label>
+                <input type="file" name="resume" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Submit Profile to Admin</button>
+        </form>
+
+        <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

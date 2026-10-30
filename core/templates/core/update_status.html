@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Candidate Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f9; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #343a40; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #495057; }
+        select, textarea, input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; }
+        .btn { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn:hover { background-color: #218838; }
+        .back-link { display: inline-block; margin-top: 15px; color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Update Status for: {{ candidate.candidate_name }}</h2>
+        <p><strong>Current Job:</strong> {{ candidate.requirement.job_title }}</p>
+        <hr>
+
+        <form method="POST">
+            <!-- THIS CSRF TOKEN IS MANDATORY TO PREVENT 403 FORBIDDEN -->
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="status">Candidate Status:</label>
+                <select name="status" id="status">
+                    <option value="Submitted" {% if candidate.status == "Submitted" %}selected{% endif %}>Submitted</option>
+                    <option value="Shortlisted" {% if candidate.status == "Shortlisted" %}selected{% endif %}>Shortlisted</option>
+                    <option value="Interviewing" {% if candidate.status == "Interviewing" %}selected{% endif %}>Interviewing</option>
+                    <option value="Offered" {% if candidate.status == "Offered" %}selected{% endif %}>Offered</option>
+                    <option value="Rejected" {% if candidate.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="current_round">Current Round / Interview Stage:</label>
+                <input type="text" name="current_round" id="current_round" value="{{ candidate.current_round }}" placeholder="e.g., Technical Round 1">
+            </div>
+
+            <div class="form-group">
+                <label for="feedback_reason">Feedback / Notes:</label>
+                <textarea name="feedback_reason" id="feedback_reason" rows="4" placeholder="Enter notes or rejection reasons...">{{ candidate.feedback_reason }}</textarea>
+            </div>
+
+            <button type="submit" class="btn">Save Status Update</button>
+        </form>
+
+        <a href="{% url 'dashboard' %}" class="back-link">&larr; Back to Dashboard</a>
+    </div>
+</body>
+</html>

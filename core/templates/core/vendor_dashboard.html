@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sreenidhi Vendor Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#0d3b66', 900: '#071f38' },
+                        corporate: { blue: '#0077b6', light: '#00b4d8' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 p-4 sm:p-6 font-sans">
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+        
+        <!-- Header Banner -->
+        <div class="bg-navy-800 text-white p-4 sm:p-6 flex flex-wrap items-center justify-between gap-4 border-b border-navy-900">
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="px-2 py-0.5 rounded bg-corporate-blue text-white text-[10px] font-bold uppercase tracking-wider">Sub-Vendor Portal</span>
+                    <span class="text-xs text-slate-300">Welcome back, <strong class="text-white">{{ request.user.username }}</strong></span>
+                </div>
+                <h2 class="text-lg sm:text-xl font-bold tracking-tight mt-1">SREENIDHI SOFTWARE SERVICES PRIVATE LIMITED</h2>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs text-slate-300">Vendor ID: <span class="font-mono text-white">VND-{% now "Y" %}-SRN</span></p>
+                    <p class="text-[11px] text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check text-[9px] mr-1"></i> Verified Partner</p>
+                </div>
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-200 text-xs font-medium transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 sm:p-6 bg-slate-50 border-b border-slate-200">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase">Assigned Requirements</p>
+                    <p class="text-2xl font-bold text-navy-800 mt-0.5">{{ assignments|length }} Jobs</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 text-corporate-blue flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase">Active Vendor</p>
+                    <p class="text-2xl font-bold text-navy-800 mt-0.5">{{ request.user.username }}</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase">Portal Status</p>
+                    <p class="text-2xl font-bold text-navy-800 mt-0.5">Live</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assigned Requirements Table -->
+        <div class="p-4 sm:p-6 flex-1 bg-white">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
+                    <i class="fa-solid fa-list text-corporate-blue"></i>
+                    <span>Assigned Job Requirements</span>
+                </h3>
+                <span class="text-xs text-slate-500">Showing {{ assignments|length }} assigned requisitions</span>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                <table class="w-full text-left text-sm text-slate-700">
+                    <thead class="bg-navy-800 text-white text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="py-3.5 px-4 font-semibold">Job Title</th>
+                            <th class="py-3.5 px-4 font-semibold">Company / Unit</th>
+                            <th class="py-3.5 px-4 font-semibold">Profiles Needed</th>
+                            <th class="py-3.5 px-4 font-semibold">Assigned On</th>
+                            <th class="py-3.5 px-4 font-semibold text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        {% for assignment in assignments %}
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="py-4 px-4 font-bold text-navy-800">{{ assignment.requirement.title }}</td>
+                                <td class="py-4 px-4 text-slate-600 text-xs">{{ assignment.requirement.company_name|default:"Sreenidhi Enterprise" }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 font-semibold text-xs border border-slate-200">
+                                        {{ assignment.requirement.positions_needed|default:"Open" }} Positions
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-xs text-slate-500">
+                                    <i class="fa-solid fa-calendar-day text-slate-400 mr-1"></i>{{ assignment.assigned_at|date:"M d, Y" }}
+                                </td>
+                                <td class="py-4 px-4 text-right">
+                                    <a href="{% url 'submit_candidate' assignment.requirement.id %}" class="px-3.5 py-1.5 rounded-lg bg-corporate-blue hover:bg-navy-800 text-white text-xs font-medium transition shadow-sm inline-flex items-center space-x-1">
+                                        <i class="fa-solid fa-user-plus text-[10px]"></i>
+                                        <span>Submit Candidate</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-slate-500 text-sm">
+                                    No requirements assigned to you yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
